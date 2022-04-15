@@ -9,7 +9,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 @available(iOS 14.0, *)
-struct CameraView: UIViewControllerRepresentable {
+public struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     @Binding var showCameraView: Bool
     
