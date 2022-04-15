@@ -9,12 +9,12 @@ import PhotosUI
 import SwiftUI
 
 @available(iOS 14, *)
-struct LibraryPickerView: UIViewControllerRepresentable {
+public struct LibraryPickerView: UIViewControllerRepresentable {
     @Binding var images: [UIImage]
     @Binding var showImagePickerView: Bool
     @State var imagePickerConfiguration: PHPickerConfiguration?
     
-    func makeUIViewController(context: Context) -> PHPickerViewController {
+    public func makeUIViewController(context: Context) -> PHPickerViewController {
         var configuration: PHPickerConfiguration
         if self.imagePickerConfiguration == nil {
             configuration = PHPickerConfiguration()
@@ -29,20 +29,20 @@ struct LibraryPickerView: UIViewControllerRepresentable {
         return imagePickerViewController
     }
     
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    public func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
     
-    func makeCoordinator() -> Coordinator {
+    public func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
     
-    class Coordinator: PHPickerViewControllerDelegate {
+    public class Coordinator: PHPickerViewControllerDelegate {
         let parent: LibraryPickerView
         
         init(_ libraryPickerView: LibraryPickerView) {
             parent = libraryPickerView
         }
         
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             for image in results {
                 if image.itemProvider.canLoadObject(ofClass: UIImage.self) {
                     image.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] newImage, error in
