@@ -13,7 +13,7 @@ public struct CameraView: UIViewControllerRepresentable {
     @Binding var image: UIImage?
     @Binding var showCameraView: Bool
     
-    static var canCaptureImages: Bool {
+    public static var canCaptureImages: Bool {
         guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
             return false
         }
