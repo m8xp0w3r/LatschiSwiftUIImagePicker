@@ -9,10 +9,10 @@ import PhotosUI
 import SwiftUI
 
 @available(iOS 14, *)
-public struct SingleLibraryPickerView: UIViewControllerRepresentable {
-    @Binding var image: UIImage?
+public struct LibraryImagePickerView: UIViewControllerRepresentable {
     @Binding var showImagePickerView: Bool
     @State var imagePickerConfiguration: PHPickerConfiguration?
+    var action: ([Data]?) -> Void
     
     public func makeUIViewController(context: Context) -> PHPickerViewController {
         var configuration: PHPickerConfiguration
@@ -36,31 +36,34 @@ public struct SingleLibraryPickerView: UIViewControllerRepresentable {
     }
     
     public class Coordinator: PHPickerViewControllerDelegate {
-        let parent: SingleLibraryPickerView
+        let parent: LibraryImagePickerView
         
-        init(_ libraryPickerView: SingleLibraryPickerView) {
+        init(_ libraryPickerView: LibraryImagePickerView) {
             parent = libraryPickerView
         }
         
         public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            if results.count == 1 {
-                let image = results[0]
-                if image.itemProvider.canLoadObject(ofClass: UIImage.self) {
-                    image.itemProvider.loadObject(ofClass: UIImage.self) { [weak self] newImage, error in
-                        if let error = error {
-                            print("Can't load image \(error.localizedDescription)")
-                        } else if let image = newImage as? UIImage {
-                            // Add new image and pass it back to the main view
-                            self?.parent.image = image
-                        }
+            var images: [Data] = []
+            for result in results {
+                result.itemProvider.loadDataRepresentation(forTypeIdentifier: "public.image") { object, error in
+                    if let error = error {
+                        print("Can't load image \(error.localizedDescription)")
+                    } else {
+                        images.append(object!)
                     }
-                } else {
-                    print("Can't load asset")
                 }
-            } else {
-                print("Invalid count of photos selected: " + String(results.count))
             }
-            parent.showImagePickerView = false
+            self.parent.action(images)
+            
+            dismissImagePickerViewController()
+        }
+        
+        private func dismissImagePickerViewController() {
+            Task {
+                await MainActor.run {
+                    parent.showImagePickerView = false
+                }
+            }
         }
     }
 }
